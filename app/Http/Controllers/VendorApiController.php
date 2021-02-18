@@ -17,4 +17,15 @@ class VendorApiController extends Controller
             'data' => $posts
         ], 200);
     }
+
+    public function show($id)
+    {
+        $post = Vendor::findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Detail Data Vendor',
+            'data' => $post
+        ], 200);
+    }
 }
