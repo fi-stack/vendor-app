@@ -10,23 +10,23 @@ class VendorApiController extends Controller
 {
     public function index()
     {
-        $posts = Vendor::latest()->get();
+        $vendors = Vendor::latest()->get();
 
         return response()->json([
             'success' => true,
             'message' => 'List Data Vendor',
-            'data' => $posts
+            'data' => $vendors
         ], 200);
     }
 
     public function show($id)
     {
-        $post = Vendor::findOrFail($id);
+        $vendor = Vendor::findOrFail($id);
 
         return response()->json([
             'success' => true,
             'message' => 'Detail Data Vendor',
-            'data' => $post
+            'data' => $vendor
         ], 200);
     }
 
@@ -44,7 +44,7 @@ class VendorApiController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
-        $post = Vendor::create([
+        $vendor = Vendor::create([
             'nama_vendor' => $request->nama_vendor,
             'alamat' => $request->alamat,
             'kota' => $request->kota,
@@ -53,11 +53,11 @@ class VendorApiController extends Controller
         ]);
 
         // success save to database
-        if ($post) {
+        if ($vendor) {
             return response()->json([
                 'success' => true,
                 'message' => 'Vendor Created',
-                'data' => $post
+                'data' => $vendor
             ], 201);
         }
 
@@ -65,5 +65,63 @@ class VendorApiController extends Controller
             'success' => false,
             'message' => 'Vendor Failed to Save',
         ], 409);
+    }
+
+    public function update(Request $request, Vendor $vendor)
+    {
+        $validator = Validator::make($request->all(), [
+            'nama_vendor' => 'required',
+            'alamat' => 'required',
+            'kota' => 'required',
+            'provinsi' => 'required',
+            'kode_pos' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        $vendor = Vendor::findOrFail($vendor->id);
+
+        if ($vendor) {
+            $vendor->update([
+                'nama_vendor' => $request->nama_vendor,
+                'alamat' => $request->alamat,
+                'kota' => $request->kota,
+                'provinsi' => $request->provinsi,
+                'kode_pos' => $request->kode_pos,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Vendor Updated',
+                'data' => $vendor
+            ], 200);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Vendor Not Found',
+        ], 404);
+    }
+
+    public function destroy($id)
+    {
+        $vendor = Vendor::findOrFail($id);
+
+        if ($vendor) {
+
+            $vendor->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'vendor Deleted',
+            ], 200);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'vendor Not Found',
+        ], 404);
     }
 }
